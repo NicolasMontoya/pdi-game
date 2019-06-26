@@ -3,7 +3,10 @@
 """
 Created on Sun Jun 23 09:03:25 2019
 
-@author: nicolas
+Clase de utilizada que genera los colores básicos del juego
+
+@author: Edward Nicolas Montoya
+@author: Surely Berrio
 """
 import numpy as np
 
