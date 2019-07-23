@@ -17,7 +17,7 @@ from Color import Color
 # Librerias de python para control visual y de matrices
 import cv2
 import numpy as np
-
+from pygame import mixer
 # Libreria de hilos
 from multiprocessing import Process, Event
 import time
@@ -29,13 +29,18 @@ class Game:
     @param camera - numero de camara a usar
     @param highRange - tono alto del color que va a detectar
     @param lowRange - tono bajo del color que va a detectar
-    @param pixelSize - Tamaño del pixel del juego (Aún no está completamente funciona)
+    @param pixelSize - Tamaño del pixel del juego 
     """
     def __init__(self, camera, highRange = np.array([125,255,255],np.uint8),
                  lowRange =  np.array([100,100,20],np.uint8), pixelSize = 10):
+        self.mixer = mixer
+        self.mixer.init()
+        self.mixer.music.load('paint.mp3')
+        self.mixer.music.play()
         self.pixelSize = pixelSize
         # Nombre de ventanas
         self.__controlMoveWindow = 'MoveWindows'
+        self.__negativePoint = 0 
         self.__boardName = 'Board'
         self.board = Board(135,80)
         self.cam = cv2.VideoCapture(camera)
@@ -57,7 +62,9 @@ class Game:
         data = []
         event = Event()
         processObjects = Process(target=self.newObject, args=(event,), name="Creating process")
+        processSound = Process(target=self.sound, args=(event,), name="Creating sound data")
         processObjects.start()
+        processSound.start()
         while True:
             self.moveControls()
             if event.is_set():
@@ -79,19 +86,33 @@ class Game:
                     printableObject.move()
                     if (finalY + 1 > 740 and finalY + 1 < 780 and self.check(name)):
                         self.score += 1
-                        if self.score == 100:
+                        if self.score == 20:
                             processObjects.terminate()
+                            processSound.terminate()
                             self.cam.release()
                             cv2.destroyAllWindows()
                             im = cv2.imread("winner.png")
                             cv2.imshow("WINNER", im)
                             if cv2.waitKey(0):
-                               cv2.destroyAllWindows() 
-                               exit()
+                                self.mixer.music.stop()
+                                cv2.destroyAllWindows()
+                                exit()
                         data.pop(num)
                     if (finalY + 1 > 780):
+                        self.__negativePoint+=1
                         data.pop(num)
+                        if(self.__negativePoint == 5):
+                            processObjects.terminate()
+                            processSound.terminate()
+                            cv2.destroyAllWindows()
+                            im = cv2.imread("loser.jpg")
+                            cv2.imshow("PERDISTE", im)
+                            if cv2.waitKey(0):
+                                self.mixer.music.stop()
+                                cv2.destroyAllWindows()
+                                exit()
             if cv2.waitKey(33) == ord('q'):
+                self.mixer.music.stop()
                 processObjects.terminate()
                 break
             matrix = self.board.printScore(matrix, self.score)
@@ -105,6 +126,11 @@ class Game:
     nuevo objeto
     """
     def newObject(self, event):
+        while True:
+            event.set()
+            time.sleep(3)
+
+    def sound(self, event):
         while True:
             event.set()
             time.sleep(3)
@@ -141,6 +167,8 @@ class Game:
             # Busca contornos en la mascara
             _,contornos,_=cv2.findContours(mask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
             # Por cada contorno analiza el area y obtiene el centroide en la imagen
+            if (len(contornos) == 0):
+                self.__state = 3
             for c in contornos:
                 area = cv2.contourArea(c)
                 if area > 2000:
