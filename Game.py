@@ -204,7 +204,7 @@ class Game:
                     # para identificar si impacto                        
                     if x >= 15 and x < 200 and y > 100 and y < 500:
                         self.__state = 0
-                    elif x >= 400 and x < 600 and y > 100 and y < 500:
+                    elif x >= 500 and x < 600 and y > 100 and y < 500:
                         self.__state = 1
                     elif x >= 15 and x < 600 and y >= 0 and y <= 100:
                         self.__state = 2

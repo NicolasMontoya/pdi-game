@@ -15,7 +15,7 @@ from Game import Game
 # Función de enganche
 def main():
     # Inicialización del Juego
-    game = Game(2)
+    game = Game(0)
     # Comienzo del juego
     game.startGame()
 
