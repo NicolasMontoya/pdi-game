@@ -1,4 +1,4 @@
-# Guitar Hero Basico openCV
+# Color Blocks openCV
 
 Este juego fue diseñado para la materia procesamiento digital de imagenes,
 su objetivo es introducir a las mécanicas de control y procesado
