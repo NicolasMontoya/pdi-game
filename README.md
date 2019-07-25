@@ -4,6 +4,13 @@ Este juego fue diseñado para la materia procesamiento digital de imagenes,
 su objetivo es introducir a las mécanicas de control y procesado
 de imagenes mediante la manipulación de matrices.
 
+## Integrantes del equipo
+
+Edward Nicolas Montoya Arcila
+Meliza Sánchez Ochoa
+Surley Berrío Zapata
+
+
 ## Requisitos
 
 - Python 3

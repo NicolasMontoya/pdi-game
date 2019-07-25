@@ -33,21 +33,29 @@ class Game:
     """
     def __init__(self, camera, highRange = np.array([125,255,255],np.uint8),
                  lowRange =  np.array([100,100,20],np.uint8), pixelSize = 10):
+        # Objeto de PyGame para usar musica de fondo.
         self.mixer = mixer
+        # Initialización del objeto para manipular la musica.
         self.mixer.init()
+        # Cargado de archivo con canción de fondo
         self.mixer.music.load('paint.mp3')
+        # Inicio de canción
         self.mixer.music.play()
+        # Definición del tamaño del pixel (cuadricula minima)
         self.pixelSize = pixelSize
         # Nombre de ventanas
         self.__controlMoveWindow = 'MoveWindows'
-        self.__negativePoint = 0 
         self.__boardName = 'Board'
+        # Creación del tablero de juego
         self.board = Board(135,80)
         self.cam = cv2.VideoCapture(camera)
+        # Rangos de colores para detección de la imagen
         self._highRange = highRange
         self._lowRange = lowRange
         self.objects = []
+        # Definición de puntuación positiva y negativa
         self.score = 0
+        self.__negativePoint = 0 
         self.__state = 3
         # Inicialización de ventanas
         cv2.namedWindow(self.__controlMoveWindow, cv2.WINDOW_AUTOSIZE)
@@ -59,14 +67,19 @@ class Game:
     el tiempo, se configura el análisis de color y movimiento
     """ 
     def startGame(self):
+        # Inicialización de arreglo de objetos
         data = []
+        # Creación de evento para control de la generación de objetos
         event = Event()
+        # Definición de proceso en segundo plano para conteo de tiempo
         processObjects = Process(target=self.newObject, args=(event,), name="Creating process")
-        processSound = Process(target=self.sound, args=(event,), name="Creating sound data")
+        # Inicio de proceso
         processObjects.start()
-        processSound.start()
+        # While infinito que da inicio al juego
         while True:
+            # Verifica el estado del juego mediante la lectura de la cámara
             self.moveControls()
+            # Si hay un evento identificado, se crea un nuevo objeto
             if event.is_set():
                 event.clear()
                 element = np.random.randint(3)
@@ -76,19 +89,28 @@ class Game:
                     obj = Object(580, 620, 0, 40, Color.getGreen(self.pixelSize, self.pixelSize), "GREEN")
                 else:
                     obj = Object(890, 930, 0, 40, Color.getRed(self.pixelSize, self.pixelSize), "RED")
+                # Creación del objeto
                 obj.genMatrix()
+                # Adición al arreglo general (lista)
                 data.append(obj)
+            # Copia de la matriz referencia
             matrix = np.copy(self.board.pixels)
             if len(data) > 0:
+                # Impresión de objetos en la pantalla
                 for num, printableObject in enumerate(data):
+                    # Trae coordenadas del objeto
                     initialX, finalX, initialY, finalY, color, name = printableObject.position()
+                    # Obtiene matriz de posición
                     matrix[initialY:finalY,initialX:finalX, :] = printableObject.matrix
+                    # Desplaza objeto
                     printableObject.move()
+                    # Revisa si el objeto esta en la franja para puntuar y es interceptado por el estado correspondiente de juego
                     if (finalY + 1 > 740 and finalY + 1 < 780 and self.check(name)):
+                        # Si es interceptado suma un punto
                         self.score += 1
+                        # Verifica si el usuario gano y termina el juego con la pantalla de ganador
                         if self.score == 20:
                             processObjects.terminate()
-                            processSound.terminate()
                             self.cam.release()
                             cv2.destroyAllWindows()
                             im = cv2.imread("winner.png")
@@ -98,12 +120,14 @@ class Game:
                                 cv2.destroyAllWindows()
                                 exit()
                         data.pop(num)
+                    # Verifica si el usuario no logro atinar al cuadro y le suma un punto negativo
                     if (finalY + 1 > 780):
                         self.__negativePoint+=1
+                        # Elimina el objeto en la parte inferior de la pantalla
                         data.pop(num)
+                        # Si el usuario suma 5 puntos negativos pierde
                         if(self.__negativePoint == 5):
                             processObjects.terminate()
-                            processSound.terminate()
                             cv2.destroyAllWindows()
                             im = cv2.imread("loser.jpg")
                             cv2.imshow("PERDISTE", im)
@@ -111,6 +135,7 @@ class Game:
                                 self.mixer.music.stop()
                                 cv2.destroyAllWindows()
                                 exit()
+            # Tecla para salirse del juego
             if cv2.waitKey(33) == ord('q'):
                 self.mixer.music.stop()
                 processObjects.terminate()
@@ -130,10 +155,6 @@ class Game:
             event.set()
             time.sleep(3)
 
-    def sound(self, event):
-        while True:
-            event.set()
-            time.sleep(3)
     """    
     Método encargado de revisar si el objeto fue identificado
     
