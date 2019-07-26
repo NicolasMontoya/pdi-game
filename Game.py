@@ -15,6 +15,7 @@ from Object import Object
 from Color import Color
 
 # Librerias de python para control visual y de matrices
+from sys import exit
 import cv2
 import numpy as np
 from pygame import mixer
@@ -118,6 +119,7 @@ class Game:
                             if cv2.waitKey(0):
                                 self.mixer.music.stop()
                                 cv2.destroyAllWindows()
+                                self.cam.release()
                                 exit()
                         data.pop(num)
                     # Verifica si el usuario no logro atinar al cuadro y le suma un punto negativo
@@ -134,6 +136,7 @@ class Game:
                             if cv2.waitKey(0):
                                 self.mixer.music.stop()
                                 cv2.destroyAllWindows()
+                                self.cam.release()
                                 exit()
             # Tecla para salirse del juego
             if cv2.waitKey(33) == ord('q'):
