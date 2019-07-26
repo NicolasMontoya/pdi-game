@@ -31,8 +31,8 @@ class Game:
     @param lowRange - tono bajo del color que va a detectar
     @param pixelSize - Tamaño del pixel del juego 
     """
-    def __init__(self, camera, highRange = np.array([125,255,255],np.uint8),
-                 lowRange =  np.array([100,100,20],np.uint8), pixelSize = 10):
+    def __init__(self, camera, highRange = np.array([140,255,255],np.uint8),
+                 lowRange =  np.array([100,150,20],np.uint8), pixelSize = 10):
         # Objeto de PyGame para usar musica de fondo.
         self.mixer = mixer
         # Initialización del objeto para manipular la musica.
@@ -63,7 +63,7 @@ class Game:
         cv2.namedWindow(self.__boardName, cv2.WINDOW_AUTOSIZE)
         cv2.moveWindow(self.__boardName, 0,0)
     """    
-    Inicio del juego, en este método se crea un proceso (Hilo) para controlar
+    Inicio del juego, en este método se crea un proceso (HhighLimitilo) para controlar
     el tiempo, se configura el análisis de color y movimiento
     """ 
     def startGame(self):

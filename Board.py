@@ -63,6 +63,9 @@ class Board:
         # Pixeles impresos en el Board que representan el simbolo :
         self.__pixels[20:30,1130+self.generalOffset:1140+self.generalOffset, :] = np.zeros((10,10,3), dtype="uint8")
         self.__pixels[40:50,1130+self.generalOffset:1140+self.generalOffset, :] = np.zeros((10,10,3), dtype="uint8")
+        
+        # Pixeles impresos en el Board que representan el simbolo :
+        self.__pixels[730:740,0:1350, :] = np.zeros((10,1350,3), dtype="uint8")
     
         # Panel inicial con los colores que indican la dirección para obtener puntos
         obj = Object(1000,1080,100,140,Color.getBlue(10,10),"BLUE")
